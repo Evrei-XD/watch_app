@@ -1,10 +1,10 @@
 /** Период между отправкой данных на сервер (в миллисекундах). */
-const PERIOD_DATA_SENDING = 30 * 1000;
+const PERIOD_DATA_SENDING = 10 * 1000;
 /** Период между проверками необходимости отправки данных на сервер (в миллисекундах). */
 const PERIOD_CHECK_STATUS = 3000;
 /** Список данных о состоянии протеза. */
 let listStatistics = {
-    sn: "TEST_ST2_SW_00009",
+    sn: "TEST_ST2_SW_00012",
     data: []
 };
 /** Информация о текущем состоянии протеза. */
@@ -43,6 +43,8 @@ let currentStatistics = {
 let statisticsRequestLastTime;
 /** Интервал для проверки заполненности информации о состоянии протеза. */
 let completenessInterval;
+/** Флаг для отпределение типа собираемых данных (true - только физическая активность пользователя). */
+let isNeedToUploadOnlyHumanActivity = false;
 
 /**
  * Функция, вызываемая при получении порогового значения для сжатия протеза.
@@ -65,6 +67,7 @@ function onGetClenchMyogram(myogramData) {
     for (let i = 1; i < 8; i++) {
         if (currentStatistics.data["2_47"]["ch" + i] === null) {
             currentStatistics.data["2_47"]["ch" + i] = myogramData;
+            break;
         }
     }
 }
@@ -76,6 +79,7 @@ function onGetUnclenchMyogram(myogramData) {
     for (let i = 1; i < 8; i++) {
         if (currentStatistics.data["3_47"]["ch" + i] === null) {
             currentStatistics.data["3_47"]["ch" + i] = myogramData;
+            break;
         }
     }
 }
@@ -94,67 +98,110 @@ function onGetHumanActivityPedometer(steps) {
     currentStatistics.data["1_48"].col_steps = steps;
 }
 
+/** Функция, вызываемая при сборе всех необходимых данных для отправки. */
+function onDataCompleteness() {
+    statisticsRequestLastTime = Date.now();
+    currentStatistics.tm = Math.floor(statisticsRequestLastTime / 1000);
+    listStatistics.data.push(currentStatistics);
+    saveToStorage();
+    currentStatistics = {
+        tm: 1594318181,
+        data: {
+            "1_48": {
+                fm: 0,
+                uptime: Math.round(PERIOD_DATA_SENDING / 1000),
+                comp_val: null,
+                de_comp_val: null,
+                col_steps: currentStatistics.data["1_48"].col_steps
+            },
+            "2_47": {
+                ch1: null,
+                ch2: null,
+                ch4: null,
+                ch5: null,
+                ch6: null,
+                ch7: null
+            },
+            "3_47": {
+                ch1: null,
+                ch2: null,
+                ch4: null,
+                ch5: null,
+                ch6: null,
+                ch7: null
+            },
+            "4_46": {
+                ch: null
+            }
+        }
+    };
+    clearInterval(completenessInterval);
+    completenessInterval = null;
+}
+
 /**
  * Функция проверки полноты информации о состоянии протеза.
  */
 function checkCompleteness() {
     let isCompleteness = true;
-    if (currentStatistics.data["1_48"].comp_val == null) {
-        addBluetoothCommandToConveyor('0xFA 0x01 0x26 0xBB');
-        isCompleteness = false;
-    }
-    if (currentStatistics.data["1_48"].de_comp_val == null) {
-        addBluetoothCommandToConveyor('0xFA 0x01 0x27 0x8A');
-        isCompleteness = false;
-    }
-    for (let i = 1; i < 8; i++) {
-        if (currentStatistics.data["2_47"]["ch" + i] === null || currentStatistics.data["3_47"]["ch" + i] === null) {
-            addBluetoothCommandToConveyor('0xFA 0x01 0x29 0x95');
+    if (isNeedToUploadOnlyHumanActivity) {
+        if (currentStatistics.data["1_48"].col_steps === -1) {
+            isCompleteness = false;
+        } else {
+            currentStatistics = {
+                tm: 1594318181,
+                data: {
+                    "1_48": {
+                        fm: 0,
+                        uptime: currentStatistics.data["1_48"].uptime,
+                        comp_val: -1,
+                        de_comp_val: -1,
+                        col_steps: currentStatistics.data["1_48"].col_steps
+                    },
+                    "2_47": {
+                        ch1: -1,
+                        ch2: -1,
+                        ch4: -1,
+                        ch5: -1,
+                        ch6: -1,
+                        ch7: -1
+                    },
+                    "3_47": {
+                        ch1: -1,
+                        ch2: -1,
+                        ch4: -1,
+                        ch5: -1,
+                        ch6: -1,
+                        ch7: -1
+                    },
+                    "4_46": {
+                        ch: -1
+                    }
+                }
+            };
+        }
+    } else {
+        if (currentStatistics.data["1_48"].comp_val == null) {
+            addBluetoothCommandToConveyor('0xFA 0x01 0x26 0xBB');
+            isCompleteness = false;
+        }
+        if (currentStatistics.data["1_48"].de_comp_val == null) {
+            addBluetoothCommandToConveyor('0xFA 0x01 0x27 0x8A');
+            isCompleteness = false;
+        }
+        for (let i = 1; i < 8; i++) {
+            if (currentStatistics.data["2_47"]["ch" + i] === null || currentStatistics.data["3_47"]["ch" + i] === null) {
+                addBluetoothCommandToConveyor('0xFA 0x01 0x29 0x95');
+                isCompleteness = false;
+            }
+        }
+        if (currentStatistics.data["4_46"].ch == null) {
+            addBluetoothCommandToConveyor('0xFA 0x01 0x31 0x46');
             isCompleteness = false;
         }
     }
-    if (currentStatistics.data["4_46"].ch == null) {
-        addBluetoothCommandToConveyor('0xFA 0x01 0x31 0x46');
-        isCompleteness = false;
-    }
     if (isCompleteness) {
-        statisticsRequestLastTime = Date.now();
-        currentStatistics.tm = Math.floor(statisticsRequestLastTime / 1000);
-        listStatistics.data.push(currentStatistics);
-        saveToStorage();
-        currentStatistics = {
-            tm: 1594318181,
-            data: {
-                "1_48": {
-                    fm: 0,
-                    uptime: Math.round(PERIOD_DATA_SENDING / 1000),
-                    comp_val: null,
-                    de_comp_val: null,
-                    col_steps: -1
-                },
-                "2_47": {
-                    ch1: null,
-                    ch2: null,
-                    ch4: null,
-                    ch5: null,
-                    ch6: null,
-                    ch7: null
-                },
-                "3_47": {
-                    ch1: null,
-                    ch2: null,
-                    ch4: null,
-                    ch5: null,
-                    ch6: null,
-                    ch7: null
-                },
-                "4_46": {
-                    ch: null
-                }
-            }
-        };
-        clearInterval(completenessInterval);
-        completenessInterval = null;
+        onDataCompleteness();
     }
 }
 
@@ -176,13 +223,13 @@ function checkNeedToRequestStatistics() {
 function checkNeedToUpload() {
     if (listStatistics.data.length > 0) {
         if (checkInternetConnection()) {
-            // console.log(listStatistics);
+            console.log(listStatistics);
             // noinspection JSUnusedLocalSymbols
             sendDataToServer(listStatistics).then((data) => {
                 if (data !== 'ERROR') {
                     console.log("Data send to server " + data.tm);
                     listStatistics = {
-                        sn: "TEST_ST2_SW_00009",
+                        sn: "TEST_ST2_SW_00012",
                         data: []
                     };
                     saveToStorage();
@@ -212,3 +259,8 @@ function startStatistics() {
     // noinspection JSUnusedLocalSymbols
     const statisticsUploadInterval = setInterval(checkNeedToUpload, PERIOD_CHECK_STATUS);
 }
+
+(() => {
+    isNeedToUploadOnlyHumanActivity = true;
+    startStatistics();
+})();

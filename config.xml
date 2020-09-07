@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<widget xmlns:tizen="http://tizen.org/ns/widgets" xmlns="http://www.w3.org/ns/widgets" id="http://infolab.club/manifesto" version="1.0.1" viewmodes="maximized">
+<widget xmlns="http://www.w3.org/ns/widgets" xmlns:tizen="http://tizen.org/ns/widgets" id="http://infolab.club/manifesto" version="1.0.0" viewmodes="maximized">
     <tizen:application id="MruOZjMOtQ.App" package="MruOZjMOtQ" required_version="4.0"/>
     <author href="https://infolab.club" email="hello@infolab.club">Info Lab</author>
     <content src="index.html"/>

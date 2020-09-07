@@ -216,6 +216,8 @@ const bluetoothApi = () => {
   }
 
   function connectToDevice() {
+    // 00001101-0000-1000-8000-00805F9B34FB - протез (физический)
+    // 9f2c4ce3-0801-42d1-ba41-1a6bfe1ccb70 - симулятор (на Android)
     var SERVICE_UUID = '00001101-0000-1000-8000-00805F9B34FB';
 
     bluetoothDevices[selectedBluetoothDeviceIndex].connectToServiceByUUID(
@@ -278,9 +280,9 @@ const bluetoothApi = () => {
           }
         };
 
+        isNeedToUploadOnlyHumanActivity = false;
         page = `top1`;
         render();
-        startStatistics();
         let timerId = setInterval(requestMyogramBluetoothData, 1000);
         requestBrushOptionsViaBluetooth();
         const requestBrushOptionsInterval = setInterval(requestBrushOptionsViaBluetooth, 10000);

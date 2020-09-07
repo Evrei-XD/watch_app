@@ -55,6 +55,7 @@ function onErrorHumanActivityPermission(error) {
 function onUpdateHumanActivity(data) {
     // noinspection JSUnresolvedVariable
     countHumanSteps = data.accumulativeTotalStepCount;
+    console.log("Count Steps: " + countHumanSteps);
     onGetHumanActivityPedometer(countHumanSteps);
 }
 
@@ -97,7 +98,7 @@ function onSuccessReadHumanActivity(data) {
         // noinspection JSUnresolvedVariable
         countHumanSteps += data[i].totalStepCount;
         // noinspection JSUnresolvedVariable
-        console.log('Step Count: ' + data[i].totalStepCount);
+        // console.log('Step Count: ' + data[i].totalStepCount);
     }
 }
 
