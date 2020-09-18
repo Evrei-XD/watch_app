@@ -303,29 +303,6 @@ const bluetoothApi = () => {
     }
   }
 
-  function requestBrushOptionsViaBluetooth() {
-    if (page === 'center' || page === 'top1' || page === 'left1') {
-      // Разжатие
-      addBluetoothCommandToConveyor('0xFA 0x01 0x27 0x8A');
-    }
-    if (page === 'center' || page === 'top1' || page === 'left2') {
-      // Сжатие
-      addBluetoothCommandToConveyor('0xFA 0x01 0x26 0xBB');
-    }
-    if (page === 'center' || page === 'top1' || page === 'right2') {
-      // Сила хвата
-      addBluetoothCommandToConveyor('0xFA 0x01 0x28 0xA4');
-    }
-    if (page === 'center' || page === 'top1' || page === 'right3') {
-      // Сила хвата
-      addBluetoothCommandToConveyor('0xFA 0x01 0x2F 0x33');
-    }
-    if (page === 'center' || page === 'top1') {
-      // Заряд аккумулятора
-      addBluetoothCommandToConveyor('0xFA 0x01 0x31 0x46');
-    }
-  }
-
   function startBluetooth() {
     bluetoothDevices = [];
     document.getElementById('header_bluetooth').innerHTML =
@@ -344,6 +321,37 @@ const bluetoothApi = () => {
     enableBluetooth();
   }
 };
+
+let triggerSendThreshold = true;
+
+function requestBrushOptionsViaBluetooth() {
+  if (page === 'center' || page === 'top1' || page === 'left1') {
+    // Разжатие
+    if (triggerSendThreshold) {
+      addBluetoothCommandToConveyor('0xFA 0x01 0x27 0x8A');
+      triggerSendThreshold = false;
+    }
+  }
+  if (page === 'center' || page === 'top1' || page === 'left2') {
+    // Сжатие
+    if (triggerSendThreshold) {
+      addBluetoothCommandToConveyor('0xFA 0x01 0x26 0xBB');
+      triggerSendThreshold = false;
+    }
+  }
+  if (page === 'center' || page === 'top1' || page === 'right2') {
+    // Сила хвата
+    addBluetoothCommandToConveyor('0xFA 0x01 0x28 0xA4');
+  }
+  if (page === 'center' || page === 'top1' || page === 'right3') {
+    // Сила хвата
+    addBluetoothCommandToConveyor('0xFA 0x01 0x2F 0x33');
+  }
+  if (page === 'center' || page === 'top1') {
+    // Заряд аккумулятора
+    addBluetoothCommandToConveyor('0xFA 0x01 0x31 0x46');
+  }
+}
 
 const sendBluetoothMessage = (message) => {
   let tmp_bytes = message.split(' ').map(function (s) {

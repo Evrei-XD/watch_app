@@ -8,6 +8,7 @@
     <feature name="http://tizen.org/feature/input.rotating_bezel"/>
     <icon src="icon.png"/>
     <name>Manifesto</name>
+    <tizen:privilege name="http://tizen.org/privilege/internet"/>
     <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
     <tizen:privilege name="http://tizen.org/privilege/bluetooth"/>
     <tizen:privilege name="http://tizen.org/privilege/healthinfo"/>

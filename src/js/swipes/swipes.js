@@ -25,6 +25,7 @@
         page = previousPage;
       else page = navigation[page].directions[swipeDirection];
     }
+    triggerSendThreshold = true;
     render();
   };
 

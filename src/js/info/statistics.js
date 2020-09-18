@@ -2,6 +2,10 @@
 const PERIOD_DATA_SENDING = 10 * 1000;
 /** Период между проверками необходимости отправки данных на сервер (в миллисекундах). */
 const PERIOD_CHECK_STATUS = 3000;
+/** Время, отведённое на сбор данных с протеза (в миллисекундах) */
+const TIME_DATA_REQUEST = 8000;
+/** Время начала сбора данных с протеза (timestamp в миллисекундах) */
+let timeDataStartRequest;
 /** Список данных о состоянии протеза. */
 let listStatistics = {
     sn: "TEST_ST2_SW_00012",
@@ -14,28 +18,28 @@ let currentStatistics = {
         "1_48": {
             fm: 0,
             uptime: Math.round(PERIOD_DATA_SENDING / 1000),
-            comp_val: null,
-            de_comp_val: null,
+            comp_val: -1,
+            de_comp_val: -1,
             col_steps: -1
         },
         "2_47": {
-            ch1: null,
-            ch2: null,
-            ch4: null,
-            ch5: null,
-            ch6: null,
-            ch7: null
+            ch1: -1,
+            ch2: -1,
+            ch4: -1,
+            ch5: -1,
+            ch6: -1,
+            ch7: -1
         },
         "3_47": {
-            ch1: null,
-            ch2: null,
-            ch4: null,
-            ch5: null,
-            ch6: null,
-            ch7: null
+            ch1: -1,
+            ch2: -1,
+            ch4: -1,
+            ch5: -1,
+            ch6: -1,
+            ch7: -1
         },
         "4_46": {
-            ch: null
+            ch: -1
         }
     }
 };
@@ -65,7 +69,7 @@ function onGetUnclenchThreshold(threshold) {
  */
 function onGetClenchMyogram(myogramData) {
     for (let i = 1; i < 8; i++) {
-        if (currentStatistics.data["2_47"]["ch" + i] === null) {
+        if (currentStatistics.data["2_47"]["ch" + i] === -1) {
             currentStatistics.data["2_47"]["ch" + i] = myogramData;
             break;
         }
@@ -77,7 +81,7 @@ function onGetClenchMyogram(myogramData) {
  */
 function onGetUnclenchMyogram(myogramData) {
     for (let i = 1; i < 8; i++) {
-        if (currentStatistics.data["3_47"]["ch" + i] === null) {
+        if (currentStatistics.data["3_47"]["ch" + i] === -1) {
             currentStatistics.data["3_47"]["ch" + i] = myogramData;
             break;
         }
@@ -110,28 +114,28 @@ function onDataCompleteness() {
             "1_48": {
                 fm: 0,
                 uptime: Math.round(PERIOD_DATA_SENDING / 1000),
-                comp_val: null,
-                de_comp_val: null,
+                comp_val: -1,
+                de_comp_val: -1,
                 col_steps: currentStatistics.data["1_48"].col_steps
             },
             "2_47": {
-                ch1: null,
-                ch2: null,
-                ch4: null,
-                ch5: null,
-                ch6: null,
-                ch7: null
+                ch1: -1,
+                ch2: -1,
+                ch4: -1,
+                ch5: -1,
+                ch6: -1,
+                ch7: -1
             },
             "3_47": {
-                ch1: null,
-                ch2: null,
-                ch4: null,
-                ch5: null,
-                ch6: null,
-                ch7: null
+                ch1: -1,
+                ch2: -1,
+                ch4: -1,
+                ch5: -1,
+                ch6: -1,
+                ch7: -1
             },
             "4_46": {
-                ch: null
+                ch: -1
             }
         }
     };
@@ -181,26 +185,26 @@ function checkCompleteness() {
             };
         }
     } else {
-        if (currentStatistics.data["1_48"].comp_val == null) {
+        if (currentStatistics.data["1_48"].comp_val === -1) {
             addBluetoothCommandToConveyor('0xFA 0x01 0x26 0xBB');
             isCompleteness = false;
         }
-        if (currentStatistics.data["1_48"].de_comp_val == null) {
+        if (currentStatistics.data["1_48"].de_comp_val === -1) {
             addBluetoothCommandToConveyor('0xFA 0x01 0x27 0x8A');
             isCompleteness = false;
         }
         for (let i = 1; i < 8; i++) {
-            if (currentStatistics.data["2_47"]["ch" + i] === null || currentStatistics.data["3_47"]["ch" + i] === null) {
+            if (currentStatistics.data["2_47"]["ch" + i] === -1 || currentStatistics.data["3_47"]["ch" + i] === -1) {
                 addBluetoothCommandToConveyor('0xFA 0x01 0x29 0x95');
                 isCompleteness = false;
             }
         }
-        if (currentStatistics.data["4_46"].ch == null) {
+        if (currentStatistics.data["4_46"].ch === -1) {
             addBluetoothCommandToConveyor('0xFA 0x01 0x31 0x46');
             isCompleteness = false;
         }
     }
-    if (isCompleteness) {
+    if (isCompleteness || Date.now() >= timeDataStartRequest + TIME_DATA_REQUEST && !isNeedToUploadOnlyHumanActivity) {
         onDataCompleteness();
     }
 }
@@ -212,6 +216,7 @@ function checkNeedToRequestStatistics() {
     const currentTimestamp = Date.now();
     if (statisticsRequestLastTime == null || currentTimestamp - statisticsRequestLastTime >= PERIOD_DATA_SENDING) {
         if (completenessInterval == null) {
+            timeDataStartRequest = Date.now();
             completenessInterval = setInterval(checkCompleteness, 500);
         }
     }
