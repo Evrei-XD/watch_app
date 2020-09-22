@@ -1,3 +1,6 @@
+/** Отключение повторяемых команд. */
+let workStation = false; // true-рабочее состояние, false-дебагагаг
+
 const bluetoothApi = () => {
   var bluetoothDevices = [];
   var socket;
@@ -299,7 +302,7 @@ const bluetoothApi = () => {
 
   function requestMyogramBluetoothData() {
     if (page === 'left1' || page === 'left2') {
-      addBluetoothCommandToConveyor('0xFA 0x01 0x29 0x95');
+      if(workStation){addBluetoothCommandToConveyor('0xFA 0x01 0x29 0x95');}
     }
   }
 
@@ -328,28 +331,28 @@ function requestBrushOptionsViaBluetooth() {
   if (page === 'center' || page === 'top1' || page === 'left1') {
     // Разжатие
     if (triggerSendThreshold) {
-      addBluetoothCommandToConveyor('0xFA 0x01 0x27 0x8A');
+      addBluetoothCommandToConveyor('0xFA 0x01 0x27 0x8A');//запрос порога датчика 2
       triggerSendThreshold = false;
     }
   }
   if (page === 'center' || page === 'top1' || page === 'left2') {
     // Сжатие
     if (triggerSendThreshold) {
-      addBluetoothCommandToConveyor('0xFA 0x01 0x26 0xBB');
+      addBluetoothCommandToConveyor('0xFA 0x01 0x26 0xBB');//запрос порога датчика 1
       triggerSendThreshold = false;
     }
   }
   if (page === 'center' || page === 'top1' || page === 'right2') {
     // Сила хвата
-    addBluetoothCommandToConveyor('0xFA 0x01 0x28 0xA4');
+	  if(workStation){addBluetoothCommandToConveyor('0xFA 0x01 0x28 0xA4');}
   }
   if (page === 'center' || page === 'top1' || page === 'right3') {
     // Сила хвата
-    addBluetoothCommandToConveyor('0xFA 0x01 0x2F 0x33');
+	  if(workStation){addBluetoothCommandToConveyor('0xFA 0x01 0x2F 0x33');}
   }
   if (page === 'center' || page === 'top1') {
     // Заряд аккумулятора
-    addBluetoothCommandToConveyor('0xFA 0x01 0x31 0x46');
+	  if(workStation){addBluetoothCommandToConveyor('0xFA 0x01 0x31 0x46');}
   }
 }
 

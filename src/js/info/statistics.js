@@ -7,6 +7,9 @@ const TIME_DATA_REQUEST = 8000;
 /** Время начала сбора данных с протеза (timestamp в миллисекундах) */
 let timeDataStartRequest;
 /** Список данных о состоянии протеза. */
+/** Отключение повторяемых команд. */
+let workStation = false; // true-рабочее состояние, false-дебаг
+
 let listStatistics = {
     sn: "TEST_ST2_SW_00014",
     data: []
@@ -186,21 +189,21 @@ function checkCompleteness() {
         }
     } else {
         if (currentStatistics.data["1_48"].comp_val === -1) {
-            addBluetoothCommandToConveyor('0xFA 0x01 0x26 0xBB');
+        	if(workStation){addBluetoothCommandToConveyor('0xFA 0x01 0x26 0xBB');}
             isCompleteness = false;
         }
         if (currentStatistics.data["1_48"].de_comp_val === -1) {
-            addBluetoothCommandToConveyor('0xFA 0x01 0x27 0x8A');
+        	if(workStation){addBluetoothCommandToConveyor('0xFA 0x01 0x27 0x8A');}
             isCompleteness = false;
         }
         for (let i = 1; i < 8; i++) {
             if (currentStatistics.data["2_47"]["ch" + i] === -1 || currentStatistics.data["3_47"]["ch" + i] === -1) {
-                addBluetoothCommandToConveyor('0xFA 0x01 0x29 0x95');
+            	if(workStation){addBluetoothCommandToConveyor('0xFA 0x01 0x29 0x95');}
                 isCompleteness = false;
             }
         }
         if (currentStatistics.data["4_46"].ch === -1) {
-            addBluetoothCommandToConveyor('0xFA 0x01 0x31 0x46');
+        	if(workStation){addBluetoothCommandToConveyor('0xFA 0x01 0x31 0x46');}
             isCompleteness = false;
         }
     }
