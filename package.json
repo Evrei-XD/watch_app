@@ -1,6 +1,6 @@
 {
   "name": "motorica-app",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "JS-модули тут не работают. Необходимо использовать IIFE.",
   "main": "index.js",
   "directories": {

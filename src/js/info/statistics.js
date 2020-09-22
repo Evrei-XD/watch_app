@@ -8,7 +8,7 @@ const TIME_DATA_REQUEST = 8000;
 let timeDataStartRequest;
 /** Список данных о состоянии протеза. */
 let listStatistics = {
-    sn: "TEST_ST2_SW_00012",
+    sn: "TEST_ST2_SW_00014",
     data: []
 };
 /** Информация о текущем состоянии протеза. */
@@ -234,7 +234,7 @@ function checkNeedToUpload() {
                 if (data !== 'ERROR') {
                     console.log("Data send to server " + data.tm);
                     listStatistics = {
-                        sn: "TEST_ST2_SW_00012",
+                        sn: "TEST_ST2_SW_00014",
                         data: []
                     };
                     saveToStorage();
@@ -266,6 +266,6 @@ function startStatistics() {
 }
 
 (() => {
-    isNeedToUploadOnlyHumanActivity = true;
+    ieedToUploadOnlyHumanActivity = true;
     startStatistics();
 })();
