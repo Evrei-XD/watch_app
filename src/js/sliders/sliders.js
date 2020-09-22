@@ -53,7 +53,7 @@ const slides = (preRender) => {
       let tmpForce1 = '0x' + tmpForce.substring(0, 2);
       let tmpForce2 = '0x' + tmpForce.substring(2);
       let tmpMessage = '0xFA 0x02 0x28 ' + tmpForce1 + ' ' + tmpForce2;
-      if(workStation){addBluetoothCommandToConveyor(tmpMessage + ' ' + getCrc(tmpMessage));}
+      addBluetoothCommandToConveyor(tmpMessage + ' ' + getCrc(tmpMessage));
     }, 400);
     
   } else if (page === `right1`) {
@@ -72,7 +72,7 @@ const slides = (preRender) => {
     controlRequestTimer = setTimeout(() => {
       let tmpLevel = '0x' + ('00' + controlLevel.toString(16)).slice(-2);
       let tmpMessage = '0xFF 0x02 0x35 ' + tmpLevel;
-      if(workStation){addBluetoothCommandToConveyor(tmpMessage + ' ' + getCrc(tmpMessage));}
+      addBluetoothCommandToConveyor(tmpMessage + ' ' + getCrc(tmpMessage));
     }, 400);    
   }
 };
