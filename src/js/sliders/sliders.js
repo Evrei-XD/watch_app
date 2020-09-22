@@ -4,8 +4,6 @@ let forceTimer;
 let forceTimerActive = false;
 let controlRequestTimer;
 let forceRequestTimer;
-/** Отключение повторяемых команд. */
-let workStation = false; // true-рабочее состояние, false-дебаг
 
 const slides = (preRender) => {
   /*const drawControlSlider = () => drawSlider(

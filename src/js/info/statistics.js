@@ -7,8 +7,6 @@ const TIME_DATA_REQUEST = 8000;
 /** Время начала сбора данных с протеза (timestamp в миллисекундах) */
 let timeDataStartRequest;
 /** Список данных о состоянии протеза. */
-/** Отключение повторяемых команд. */
-let workStation = false; // true-рабочее состояние, false-дебаг
 
 let listStatistics = {
     sn: "TEST_ST2_SW_00014",
