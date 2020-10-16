@@ -7,8 +7,12 @@ const TIME_DATA_REQUEST = 8000;
 /** Время начала сбора данных с протеза (timestamp в миллисекундах) */
 let timeDataStartRequest;
 /** Список данных о состоянии протеза. */
+<<<<<<< HEAD
+
+=======
+>>>>>>> parent of 675b3c9... 10:00 Дополнение предыдущего коммита
 let listStatistics = {
-    sn: "TEST_ST2_SW_00012",
+    sn: "TEST_ST2_SW_00014",
     data: []
 };
 /** Информация о текущем состоянии протеза. */
@@ -234,7 +238,7 @@ function checkNeedToUpload() {
                 if (data !== 'ERROR') {
                     console.log("Data send to server " + data.tm);
                     listStatistics = {
-                        sn: "TEST_ST2_SW_00012",
+                        sn: "TEST_ST2_SW_00014",
                         data: []
                     };
                     saveToStorage();
@@ -266,6 +270,6 @@ function startStatistics() {
 }
 
 (() => {
-    isNeedToUploadOnlyHumanActivity = true;
+    ieedToUploadOnlyHumanActivity = true;
     startStatistics();
 })();
