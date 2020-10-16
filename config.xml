@@ -12,5 +12,7 @@
     <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
     <tizen:privilege name="http://tizen.org/privilege/bluetooth"/>
     <tizen:privilege name="http://tizen.org/privilege/healthinfo"/>
+    <tizen:privilege name="http://tizen.org/privilege/power"/>
     <tizen:profile name="wearable"/>
+    <tizen:setting background-support="enable"/>
 </widget>
